@@ -29,7 +29,7 @@
         </a-row>
         <a-divider dashed style="margin: 2px 0"/>
         <a-row>
-          <ranking title="商户交易金额排行（前10名）" :list="mchtTransactionList"></ranking>
+          <ranking title="商户交易额排行（前10名）" :list="mchtTransactionList"></ranking>
         </a-row>
       </a-col>
     </a-row>
