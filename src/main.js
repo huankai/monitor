@@ -24,6 +24,7 @@ Vue.use(Icon);
 Vue.use(LocaleProvider);
 Vue.use(Table);
 Vue.use(Divider);
+
 new Vue({
   "el": "#app",
   router,

@@ -13,7 +13,7 @@
     <a-row :gutter="24" style="margin-left: 0;margin-right: 0">
       <a-col :sm="24" :md="24" :xl="6">
         <a-row>
-          <mcht-statics></mcht-statics>
+          <mcht-statics :total-mcht-count="totalMchtCount" :today-mcht-count="toDayMchtCount"></mcht-statics>
         </a-row>
         <a-divider dashed style="margin: 2px 0"/>
         <a-row>
@@ -21,39 +21,45 @@
         </a-row>
       </a-col>
       <a-col :sm="24" :md="24" :xl="12">
-        <distribution></distribution>
+        <distribution :province-amount="provinceAmountList"></distribution>
       </a-col>
       <a-col :sm="24" :md="24" :xl="6">
         <a-row>
-          <real-transaction></real-transaction>
+          <real-transaction :today-trans-count="realTransaction.todayTransCount"
+                            :today-trans-amount="realTransaction.todayTransAmount"
+                            :total-trans-count="realTransaction.totalTransCount"
+                            :total-trans-amount="realTransaction.totalTransAmount"></real-transaction>
         </a-row>
         <a-divider dashed style="margin: 2px 0"/>
         <a-row>
-          <ranking title="商户交易额排行（前10名）" :list="mchtTransactionList"></ranking>
+          <ranking title="商户交易额排行（前10名,单位:元）" :list="mchtTransactionList"></ranking>
         </a-row>
       </a-col>
     </a-row>
     <a-divider dashed style="margin: 2px 0"></a-divider>
     <a-row>
       <a-col :sm="24" :md="24" :xl="6">
-        <quarterly-transaction></quarterly-transaction>
+        <quarterly-transaction :legend-data="quarterTrans.legendData"
+                               :data-list="quarterTrans.dataList"></quarterly-transaction>
       </a-col>
       <a-col :sm="24" :md="24" :xl="6">
-        <passageway></passageway>
+        <passageway :legend-data="passagewayTrans.legendData" :data-list="passagewayTrans.dataList"></passageway>
       </a-col>
       <a-col :sm="24" :md="24" :xl="6">
-        <equipment-transaction></equipment-transaction>
+        <equipment-transaction :x-axis-data="yearEquipmentTrans.xaxisData"
+                               :data-list="yearEquipmentTrans.dataList"></equipment-transaction>
       </a-col>
       <a-col :sm="24" :md="24" :xl="6">
       </a-col>
       <a-col :sm="24" :md="24" :xl="6">
-        <today-equipment-transaction></today-equipment-transaction>
+        <today-equipment-transaction :x-axis-data="todayEquipmentTrans.xaxisData"
+                                     :data-list="todayEquipmentTrans.dataList"></today-equipment-transaction>
       </a-col>
     </a-row>
     <a-divider dashed style="margin: 2px 0"></a-divider>
     <a-row>
-      <a-col :sm="24" :md="24" :xl="18">
-        <amount-transaction></amount-transaction>
+      <a-col :sm="24" :md="24" :xl="24">
+        <amount-transaction :x-axis-data="amountRange.xaxisData" :data-list="amountRange.dataList"></amount-transaction>
       </a-col>
     </a-row>
   </div>
@@ -70,72 +76,10 @@
   import EquipmentTransaction from "@/views/dashboard/EquipmentTransaction";
   import AmountTransaction from "@/views/dashboard/AmountTransaction";
   import TodayEquipmentTransaction from "@/views/dashboard/TodayEquipmentTransaction";
-  import moment from 'moment';
+  // import moment from 'moment';
 
-  const provinceMchtList = [{
-    name: "广东",
-    value: 6298
-  }, {
-    name: "广西",
-    value: 5185
-  }, {
-    name: "湖南",
-    value: 5035
-  }, {
-    name: "浙江",
-    value: 5016
-  }, {
-    name: "湖北",
-    value: 4996
-  }, {
-    name: "河南",
-    value: 4990
-  }, {
-    name: "重庆",
-    value: 3185
-  }, {
-    name: "贵州",
-    value: 2685
-  }, {
-    name: "福建",
-    value: 2185
-  }, {
-    name: "江西",
-    value: 1185
-  }];
-
-  const mchtTransactionList = [{
-    name: "蜂鸟普惠",
-    value: "6298万"
-  }, {
-    name: "好男人",
-    value: "5185万"
-  }, {
-    name: "喜士多",
-    value: "5035万"
-  }, {
-    name: "咿呀（个体户）",
-    value: "5016万"
-  }, {
-    name: "蜂鸟智慧商圈",
-    value: "4996万"
-  }, {
-    name: "全家生鲜超市",
-    value: "4990万"
-  }, {
-    name: "采蝶轩蛋糕店",
-    value: "3185万"
-  }, {
-    name: "探炉烤鱼",
-    value: "2685万"
-  }, {
-    name: "美宜佳",
-    value: "2185万"
-  }, {
-    name: "超级士多店",
-    value: "1185万"
-  }];
-
+  import SocketJS from 'sockjs-client'
+  import Stomp from 'stompjs'
 
   export default {
     name: "Dashboard",
@@ -145,21 +89,122 @@
       TodayEquipmentTransaction, AmountTransaction
     },
     mounted() {
-      let _this = this;
-      this.timer = setInterval(() => {
-        _this.currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
-      }, 1000);
+      // let _this = this;
+      // this.timer = setInterval(() => {
+      //   _this.currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      // }, 1000);
+      this.connect();
     },
     beforeDestroy() {
-      if (this.timer) {
-        clearInterval(this.timer);
-      }
+      // if (this.timer) {
+      //   clearInterval(this.timer);
+      // }
     },
     data() {
       return {
         currentTime: null,
-        provinceMchtList, // 省前 10 名商户数
-        mchtTransactionList, // 商户前10 名交易额排行
+        provinceMchtList: [], // 省前 10 名商户数
+        mchtTransactionList: [], // 商户前10 名交易额排行
+        socket: null,
+        stompClient: null,
+
+        totalMchtCount: null,
+        toDayMchtCount: null,
+
+        provinceAmountList: [],
+        realTransaction: {},
+
+        quarterTrans: {
+          legendData: [],
+          dataList: [],
+        },
+        passagewayTrans: {
+          legendData: [],
+          dataList: []
+        },
+        yearEquipmentTrans: {
+          xaxisData: [],
+          dataList: []
+        },
+        todayEquipmentTrans: {
+          xaxisData: [],
+          dataList: []
+        },
+        amountRange: {
+          xaxisData: [],
+          dataList: []
+        }
+      }
+    },
+    methods: {
+      connect() {
+        const socketUrl = process.env.VUE_APP_MONITOR_CONTEXT_PATH + "/endpointMonitor";
+        this.socket = new SocketJS(socketUrl);
+        this.stompClient = Stomp.over(this.socket);
+        this.stompClient.connect({}, (frame) => {
+          this.successCallback();
+        }, () => {
+          this.reconnect(socketUrl, this.successCallback)
+        });
+      },
+      successCallback() {
+        this.stompClient.subscribe('/queue/mchtStatics', this.receiveMchtStaticsMessage);
+        this.stompClient.subscribe('/queue/topProvinceMcht', this.receiveTopProvinceMcht);
+        this.stompClient.subscribe('/queue/provinceAmount', this.receiveprovinceAmount);
+        this.stompClient.subscribe('/queue/transStatics', this.receiveTransStatics);
+        this.stompClient.subscribe('/queue/sumMchtStatics', this.receiveSumMchtStatics);
+        this.stompClient.subscribe('/queue/quarterTransStatics', this.receiveQuarterTransStatics);
+        this.stompClient.subscribe('/queue/passagewayTransStatics', this.receivePassagewayTransStatics);
+        this.stompClient.subscribe('/queue/yearEquipmentTransStatics', this.receiveYearEquipmentTransStatics);
+        this.stompClient.subscribe('/queue/todayEquipmentTransStatics', this.receiveTodayEquipmentTransStatics);
+        this.stompClient.subscribe('/queue/amountRangeTransStatics', this.receiveAmountRangeTransStatics);
+      },
+
+      reconnect(socketUrl, successCallback) {
+
+      },
+
+      receiveTodayEquipmentTransStatics(payload) {
+        this.todayEquipmentTrans = JSON.parse(payload.body).data;
+      },
+      receiveYearEquipmentTransStatics(payload) {
+        this.yearEquipmentTrans = JSON.parse(payload.body).data;
+      },
+      receiveQuarterTransStatics(payload) {
+        this.quarterTrans = JSON.parse(payload.body).data;
+      },
+      receiveAmountRangeTransStatics(payload) {
+        this.amountRange = JSON.parse(payload.body).data;
+      },
+      receivePassagewayTransStatics(payload) {
+        let data = JSON.parse(payload.body);
+        this.passagewayTrans = data.data
+      },
+      receiveSumMchtStatics(payload) {
+        this.mchtTransactionList = JSON.parse(payload.body).data;
+      },
+      receiveTransStatics(payload) {
+        let result = JSON.parse(payload.body);
+        this.realTransaction = result.data;
+      },
+      receiveMchtStaticsMessage(payload) {
+        let result = JSON.parse(payload.body);
+        this.totalMchtCount = result.data.totalMchtCount;
+        this.toDayMchtCount = result.data.toDayMchtCount;
+      },
+
+      receiveTopProvinceMcht(payload) {
+        this.provinceMchtList = JSON.parse(payload.body).data;
+      },
+
+      receiveprovinceAmount(payload) {
+        this.provinceAmountList = JSON.parse(payload.body).data;
+        console.log(this.provinceAmountList);
+      },
+      disconnect() {
+        if (this.stompClient) {
+          this.stompClient.disconnect();
+        }
       }
     }
   }

@@ -4,22 +4,33 @@
       <div class="header-t">
         <div class="header-t-l">
           <div class="mer-title">总商户数</div>
-          <div class="mer-num">100</div>
+          <div class="mer-num">{{ totalMchtCount }}</div>
         </div>
         <div class="header-t-r">
           <div class="mer-title">今日商户数</div>
-          <div class="mer-num">100</div>
+          <div class="mer-num">{{ todayMchtCount }}</div>
         </div>
       </div>
-      <div class="header-b">日增幅&nbsp;&nbsp;2% <span><a-icon type="caret-up"/></span></div>
+      <div class="header-b">日增幅&nbsp;&nbsp; {{ increase }} <span><a-icon type="caret-up"/></span></div>
     </div>
   </a-card>
 </template>
 <script>
-
   /*商户统计*/
   export default {
-    name: "MchtStatics"
+    name: "MchtStatics",
+    props: {
+      totalMchtCount: {
+        default: 1
+      },
+      todayMchtCount: {
+        default: 1
+      },
+      increase: {
+        type: String,
+        default: ""
+      }
+    }
   }
 </script>
 <style scoped>

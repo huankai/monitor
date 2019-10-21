@@ -13,69 +13,77 @@
   /* 通道交易分布*/
   export default {
     name: "Passageway",
+    props: {
+      legendData: {
+        default: []
+      },
+      dataList: {
+        default: []
+      }
+    },
     data() {
       return {
         text: "2019年通道交易统计图",
-        subtext: "单位(万)",
-        legendData: ['乐刷', '中付', '通联', '合利宝', '汇卡', '支付宝', '微信'],
-        data: [
-          {value: 335, name: '乐刷'},
-          {value: 310, name: '中付'},
-          {value: 234, name: '通联'},
-          {value: 135, name: '合利宝'},
-          {value: 135, name: '汇卡'},
-          {value: 135, name: '支付宝'},
-          {value: 135, name: '微信'}
-        ]
+        subtext: "单位(元)",
       }
     },
+    watch: {
+      dataList: "drawing"
+    },
     mounted() {
-      let passagewayEcharts = echarts.init(document.getElementById("passagewayEcharts"));
-      passagewayEcharts.setOption({
-        title: {
-          text: this.text,
-          subtext: this.subtext,
-          x: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: "{a} <br/>{b}: {c} ({d}%)"
-        },
-        legend: {
-          orient: 'vertical',
-          x: 'left',
-          align: 'auto',
-          data: this.legendData
-        },
-        series: [
-          {
-            name: '通道交易分布',
-            type: 'pie',
-            radius: ['0', '50%'],
-            avoidLabelOverlap: false,
-            label: {
-              normal: {
-                show: true,
-                formatter: '{b}:{c}',
-              },
-              emphasis: {
-                show: true,
-                textStyle: {
-                  fontSize: '30',
-                  fontWeight: 'bold'
-                }
-              }
+      this.drawing()
+    },
+    methods: {
+      drawing() {
+        if (this.dataList.length > 0) {
+          let passagewayEcharts = echarts.init(document.getElementById("passagewayEcharts"));
+          passagewayEcharts.setOption({
+            title: {
+              text: this.text,
+              subtext: this.subtext,
+              x: 'center'
             },
-            // labelLine: {
-            //   normal: {
-            //     show: true // 是否显示类型指向线条
-            //   }
-            // },
-            data: this.data
+            tooltip: {
+              trigger: 'item',
+              formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            legend: {
+              orient: 'vertical',
+              x: 'left',
+              align: 'auto',
+              data: this.legendData
+            },
+            series: [
+              {
+                name: '通道交易分布',
+                type: 'pie',
+                radius: ['0', '50%'],
+                avoidLabelOverlap: false,
+                label: {
+                  normal: {
+                    show: true,
+                    formatter: '{b}:{c}',
+                  },
+                  emphasis: {
+                    show: true,
+                    textStyle: {
+                      fontSize: '30',
+                      fontWeight: 'bold'
+                    }
+                  }
+                },
+                // labelLine: {
+                //   normal: {
+                //     show: true // 是否显示类型指向线条
+                //   }
+                // },
+                data: this.dataList
 
-          }
-        ]
-      });
+              }
+            ]
+          });
+        }
+      }
     }
   }
 </script>

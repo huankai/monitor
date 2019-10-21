@@ -12,60 +12,69 @@
   /* 年季度交易图*/
   export default {
     name: "QuarterlyTransaction",
+    props: {
+      legendData: {
+        default: []
+      },
+      dataList: {
+        default: []
+      }
+    },
     data() {
       return {
         text: "2019年季度交易图",
-        subtext: "单位(万)",
-        legendData: ['一季度', '二季度', '三季度', '四季度'],
-        data: [
-          {value: 335, name: '一季度'},
-          {value: 310, name: '二季度'},
-          {value: 234, name: '三季度'},
-          {value: 135, name: '四季度'}
-        ]
+        subtext: "单位(元)"
       }
     },
+    watch: {
+      dataList: "drawing"
+    },
     mounted() {
-      let quarterlyTransaction = echarts.init(document.getElementById("quarterlyEcharts"));
-      quarterlyTransaction.setOption({
-        title: {
-          text: this.text,
-          subtext: this.subtext,
-          x: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: "{a} <br/>{b} : {c} ({d}%)"
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-          data: this.legendData
-        },
-        series: [
-          {
-            name: '季度交易',
-            type: 'pie',
-            radius: '55%',
-            center: ['50%', '60%'],
-            data: this.data,
-            itemStyle: {
-              normal: {
-                label: {
-                  show: true,
-                  formatter: '{b}\n{c}',
+      this.drawing()
+    },
+    methods: {
+      drawing() {
+        let quarterlyTransaction = echarts.init(document.getElementById("quarterlyEcharts"));
+        quarterlyTransaction.setOption({
+          title: {
+            text: this.text,
+            subtext: this.subtext,
+            x: 'center'
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+          },
+          legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: this.legendData
+          },
+          series: [
+            {
+              name: '季度交易',
+              type: 'pie',
+              radius: '55%',
+              center: ['50%', '60%'],
+              data: this.dataList,
+              itemStyle: {
+                normal: {
+                  label: {
+                    show: true,
+                    formatter: '{b}\n{c}',
+                  },
+                  borderWidth: 0
                 },
-                borderWidth: 0
-              },
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                emphasis: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
               }
             }
-          }
-        ]
-      });
+          ]
+        });
+      }
     }
   }
 </script>

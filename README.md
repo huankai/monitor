@@ -26,4 +26,8 @@ npm run lint
 ```
 
 ### Customize configuration
+
+![](https://raw.githubusercontent.com/huankai/monitor/master/public/images/main.png)
+
+
 See [Configuration Reference](https://cli.vuejs.org/config/).
