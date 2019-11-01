@@ -21,6 +21,8 @@
         </a-row>
       </a-col>
       <a-col :sm="24" :md="24" :xl="12">
+        <div class="title"></div>
+        <div class="time">{{ currentTime }}</div>
         <distribution :province-amount="provinceAmountList"></distribution>
       </a-col>
       <a-col :sm="24" :md="24" :xl="6">
@@ -50,8 +52,6 @@
                                :data-list="yearEquipmentTrans.dataList"></equipment-transaction>
       </a-col>
       <a-col :sm="24" :md="24" :xl="6">
-      </a-col>
-      <a-col :sm="24" :md="24" :xl="6">
         <today-equipment-transaction :x-axis-data="todayEquipmentTrans.xaxisData"
                                      :data-list="todayEquipmentTrans.dataList"></today-equipment-transaction>
       </a-col>
@@ -76,7 +76,7 @@
   import EquipmentTransaction from "@/views/dashboard/EquipmentTransaction";
   import AmountTransaction from "@/views/dashboard/AmountTransaction";
   import TodayEquipmentTransaction from "@/views/dashboard/TodayEquipmentTransaction";
-  // import moment from 'moment';
+  import moment from 'moment';
 
   import SocketJS from 'sockjs-client'
   import Stomp from 'stompjs'
@@ -89,16 +89,16 @@
       TodayEquipmentTransaction, AmountTransaction
     },
     mounted() {
-      // let _this = this;
-      // this.timer = setInterval(() => {
-      //   _this.currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
-      // }, 1000);
+      let _this = this;
+      this.timer = setInterval(() => {
+        _this.currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      }, 1000);
       this.connect();
     },
     beforeDestroy() {
-      // if (this.timer) {
-      //   clearInterval(this.timer);
-      // }
+      if (this.timer) {
+        clearInterval(this.timer);
+      }
     },
     data() {
       return {
@@ -150,7 +150,7 @@
       successCallback() {
         this.stompClient.subscribe('/queue/mchtStatics', this.receiveMchtStaticsMessage);
         this.stompClient.subscribe('/queue/topProvinceMcht', this.receiveTopProvinceMcht);
-        this.stompClient.subscribe('/queue/provinceAmount', this.receiveprovinceAmount);
+        this.stompClient.subscribe('/queue/provinceAmount', this.receiveProvinceAmount);
         this.stompClient.subscribe('/queue/transStatics', this.receiveTransStatics);
         this.stompClient.subscribe('/queue/sumMchtStatics', this.receiveSumMchtStatics);
         this.stompClient.subscribe('/queue/quarterTransStatics', this.receiveQuarterTransStatics);
@@ -161,7 +161,7 @@
       },
 
       reconnect(socketUrl, successCallback) {
-
+        alert('连接已断开，请刷新页面重新连接...')
       },
 
       receiveTodayEquipmentTransStatics(payload) {
@@ -177,29 +177,24 @@
         this.amountRange = JSON.parse(payload.body).data;
       },
       receivePassagewayTransStatics(payload) {
-        let data = JSON.parse(payload.body);
-        this.passagewayTrans = data.data
+        this.passagewayTrans = JSON.parse(payload.body).data
       },
       receiveSumMchtStatics(payload) {
         this.mchtTransactionList = JSON.parse(payload.body).data;
       },
       receiveTransStatics(payload) {
-        let result = JSON.parse(payload.body);
-        this.realTransaction = result.data;
+        this.realTransaction = JSON.parse(payload.body).data;
       },
       receiveMchtStaticsMessage(payload) {
         let result = JSON.parse(payload.body);
         this.totalMchtCount = result.data.totalMchtCount;
         this.toDayMchtCount = result.data.toDayMchtCount;
       },
-
       receiveTopProvinceMcht(payload) {
         this.provinceMchtList = JSON.parse(payload.body).data;
       },
-
-      receiveprovinceAmount(payload) {
+      receiveProvinceAmount(payload) {
         this.provinceAmountList = JSON.parse(payload.body).data;
-        console.log(this.provinceAmountList);
       },
       disconnect() {
         if (this.stompClient) {
@@ -211,5 +206,21 @@
 </script>
 
 <style scoped>
+  .title {
+    width: 100%;
+    height: 40px;
+    background: #fff url(../../assets/title.png) no-repeat center center;
+    background-size: 575px 32px;
+  }
+  .time {
+    width: 100%;
+    height: 24px;
+    float: right;
+    line-height: 24px;
+    font-size: 20px;
+    background: #fff;
+    text-align: center;
+    color: #404040;
+  }
 
 </style>

@@ -31,7 +31,8 @@
           title: [{
             text: '各省交易金额分布图',
             subtext: "单位(元)",
-            left: 'center'
+            left: 'center',
+            top: 80
           }, {
             id: 'statistic',
             text: 'xxx',
@@ -49,10 +50,14 @@
             show: true,
             roam: false, //是否允许鼠标滚动放大，缩小
             map: 'china',
+
+
+
             label: {  //图形上的文本标签，可用于说明图形的一些数据信息
               show: true,  //是否显示文本
               color: '#CCC',  //文本颜色
             },
+
             itemStyle: { //地图区域的多边形 图形样式。 默认样试。
               areaColor: '#2d89e5', //地图区域的颜色。
               borderColor: '#111', //边框线
@@ -109,7 +114,7 @@
               },
               //标记的大小,可以设置数组或者函数返回值的形式
               symbolSize: function (val) {
-                return Math.sqrt(val[2]) / 100;
+                return Math.sqrt(val[2]) / 300;
               },
               rippleEffect: { //涟漪特效相关配置。
                 brushType: 'stroke' //波纹的绘制方式

@@ -14,8 +14,7 @@
     name: "EquipmentTransaction",
     props: {
       xAxisData: {
-        type: Array,
-        default: []
+        type: Array
       },
       dataList: {
         default: []

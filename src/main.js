@@ -25,6 +25,9 @@ Vue.use(LocaleProvider);
 Vue.use(Table);
 Vue.use(Divider);
 
+
+import '@babel/polyfill';
+
 new Vue({
   "el": "#app",
   router,

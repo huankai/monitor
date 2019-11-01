@@ -59,9 +59,12 @@
               data: this.dataList,
               itemStyle: {
                 normal: {
-                  label: {
+                  labelLine: {
                     show: true,
                     formatter: '{b}\n{c}',
+                    smooth:  true,
+                    // length: 10,
+                    length2: 50
                   },
                   borderWidth: 0
                 },

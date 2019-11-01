@@ -59,26 +59,24 @@
                 type: 'pie',
                 radius: ['0', '50%'],
                 avoidLabelOverlap: false,
-                label: {
+                data: this.dataList,
+                itemStyle: {
                   normal: {
-                    show: true,
-                    formatter: '{b}:{c}',
+                    labelLine: {
+                      show: true,
+                      formatter: '{b}\n{c}',
+                      smooth:  1,
+                      length: 10,
+                      length2: 50
+                    },
+                    borderWidth: 0
                   },
                   emphasis: {
-                    show: true,
-                    textStyle: {
-                      fontSize: '30',
-                      fontWeight: 'bold'
-                    }
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
                   }
-                },
-                // labelLine: {
-                //   normal: {
-                //     show: true // 是否显示类型指向线条
-                //   }
-                // },
-                data: this.dataList
-
+                }
               }
             ]
           });
